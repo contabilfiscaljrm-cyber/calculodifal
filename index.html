@@ -1,289 +1,1208 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Fiscal Pro</title>
+    <style>
+        /* ==========================================================================
+           1. VARIÁVEIS GLOBAIS E ESTILOS BASE (TEMA DARK NEON)
+           ========================================================================== */
+        :root {
+            --bg-principal: #050505;
+            --bg-painel: #111114;
+            --bg-sidebar: #09090b;
+            --verde-neon: #00ff99;
+            --verde-glow: rgba(0, 255, 153, 0.2);
+            --azul-detalhe: #0066cc;
+            --azul-glow: rgba(0, 102, 204, 0.3);
+            --texto-claro: #f4f4f5;
+            --texto-mutado: #a1a1aa;
+            --borda-glass: rgba(255, 255, 255, 0.05);
+            --transicao-suave: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-<title>Calculadora DIFAL Goiás</title>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
 
-<style>
+        body {
+            background-color: var(--bg-principal);
+            color: var(--texto-claro);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Segoe UI,Arial,sans-serif;
-}
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-principal);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--verde-neon);
+        }
 
-body{
-    background:#050505;
-    color:#00ff99;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    min-height:100vh;
+        /* ==========================================================================
+           2. ESTRUTURA DE LAYOUT (SIDEBAR & CONTEÚDO)
+           ========================================================================== */
+        .mobile-header {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--bg-sidebar);
+            border-bottom: 1px solid var(--borda-glass);
+            align-items: center;
+            padding: 0 20px;
+            z-index: 1000;
+            justify-content: space-between;
+        }
 
-    background-image:
-    linear-gradient(rgba(0,255,150,.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,255,150,.05) 1px, transparent 1px);
+        .btn-menu-toggle {
+            background: none;
+            border: none;
+            color: var(--verde-neon);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+        }
 
-    background-size:30px 30px;
-}
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--borda-glass);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 999;
+            transition: var(--transicao-suave);
+        }
 
-.container{
-    width:700px;
-    max-width:95%;
-    padding:35px;
-    border-radius:18px;
-    background:#111;
-    border:1px solid #00ff99;
-    box-shadow:
-    0 0 15px #00ff99,
-    inset 0 0 15px rgba(0,255,120,.15);
-}
+        .sidebar-brand {
+            padding: 30px 24px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--texto-claro);
+            border-bottom: 1px solid var(--borda-glass);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-h1{
-    text-align:center;
-    margin-bottom:10px;
-    color:#00ff99;
-    text-shadow:
-    0 0 8px #00ff99,
-    0 0 20px #00ff99;
-}
+        .sidebar-brand span {
+            color: var(--verde-neon);
+            text-shadow: 0 0 10px var(--verde-glow);
+        }
 
-.subtitulo{
-    text-align:center;
-    margin-bottom:30px;
-    color:#88ffcc;
-}
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
+        }
 
-label{
-    display:block;
-    margin-top:18px;
-    margin-bottom:8px;
-}
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            color: var(--texto-mutado);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transicao-suave);
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
 
-input{
-    width:100%;
-    padding:14px;
-    font-size:18px;
-    background:#1b1b1b;
-    color:#00ff99;
-    border:1px solid #00ff99;
-    border-radius:8px;
-}
+        .menu-item:hover {
+            color: var(--texto-claro);
+            background: rgba(255, 255, 255, 0.02);
+            border-color: rgba(255, 255, 255, 0.05);
+        }
 
-input:focus{
-    outline:none;
-    box-shadow:0 0 10px #00ff99;
-}
+        .menu-item.active {
+            color: var(--bg-principal);
+            background: var(--verde-neon);
+            font-weight: 600;
+            box-shadow: 0 0 15px var(--verde-glow);
+        }
 
-.botoes{
-    display:flex;
-    gap:15px;
-    margin-top:30px;
-}
+        .menu-item.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
 
-button{
-    flex:1;
-    padding:15px;
-    font-size:18px;
-    cursor:pointer;
-    background:#00ff99;
-    color:#000;
-    border:none;
-    border-radius:8px;
-    font-weight:bold;
-    transition:.3s;
-}
+        .menu-item .icon {
+            margin-right: 12px;
+            font-size: 1.1rem;
+        }
 
-button:hover{
-    box-shadow:0 0 18px #00ff99;
-    transform:scale(1.03);
-}
+        .menu-item.disabled .badge {
+            margin-left: auto;
+            font-size: 0.7rem;
+            background: #27272a;
+            color: var(--texto-mutado);
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
 
-.resultado{
-    margin-top:35px;
-}
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 40px;
+            min-width: 320px;
+            transition: var(--transicao-suave);
+        }
 
-.card{
-    margin-top:15px;
-    background:#191919;
-    border-left:5px solid #00ff99;
-    padding:18px;
-    border-radius:8px;
-}
+        /* ==========================================================================
+           3. ESTILIZAÇÃO DAS SEÇÕES E CARDS (GLASSMORPHISM)
+           ========================================================================== */
+        .section-panel {
+            display: none;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
 
-.card span{
-    float:right;
-    font-weight:bold;
-}
+        .section-panel.active {
+            display: block;
+        }
 
-.total{
-    margin-top:25px;
-    text-align:center;
-    border:2px solid #00ff99;
-    border-radius:10px;
-    padding:25px;
-    font-size:28px;
-    font-weight:bold;
-    box-shadow:0 0 20px #00ff99;
-}
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-</style>
+        .section-header {
+            margin-bottom: 30px;
+            width: 100%;
+        }
 
+        .section-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .section-header p {
+            color: var(--texto-mutado);
+            font-size: 1rem;
+            display: block;
+            max-width: 800px;
+            line-height: 1.4;
+        }
+
+        .home-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .card-home {
+            background: var(--bg-painel);
+            border: 1px solid var(--borda-glass);
+            border-radius: 12px;
+            padding: 24px;
+            transition: var(--transicao-suave);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-home::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--azul-detalhe);
+            transition: var(--transicao-suave);
+        }
+
+        .card-home:hover {
+            transform: translateY(-4px);
+            border-color: rgba(0, 255, 153, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 255, 153, 0.05);
+        }
+
+        .card-home:hover::before {
+            background: var(--verde-neon);
+            box-shadow: 0 0 10px var(--verde-neon);
+        }
+
+        .card-home h3 {
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-home p {
+            color: var(--texto-mutado);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .panel-form, .panel-result {
+            background: var(--bg-painel);
+            border: 1px solid var(--borda-glass);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        .panel-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--borda-glass);
+            color: var(--texto-claro);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ==========================================================================
+           4. ELEMENTOS DE FORMULÁRIO E INPUTS
+           ========================================================================== */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--texto-mutado);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-prefix {
+            position: absolute;
+            left: 16px;
+            color: var(--texto-mutado);
+            font-size: 0.95rem;
+            font-weight: 500;
+            pointer-events: none;
+        }
+
+        .form-control {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid #27272a;
+            border-radius: 8px;
+            padding: 14px 16px;
+            color: var(--texto-claro);
+            font-size: 1rem;
+            font-weight: 500;
+            transition: var(--transicao-suave);
+        }
+
+        .form-control-prefix {
+            padding-left: 45px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--azul-detalhe);
+            box-shadow: 0 0 0 3px var(--azul-glow);
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        select.form-control {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23a1a1aa' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/\3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: calc(100% - 16px) center;
+            padding-right: 40px;
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 20px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transicao-suave);
+        }
+
+        .btn-primary {
+            background: var(--verde-neon);
+            color: var(--bg-principal);
+            box-shadow: 0 4px 14px var(--verde-glow);
+        }
+
+        .btn-primary:hover {
+            background: #00e68a;
+            box-shadow: 0 6px 20px rgba(0, 255, 153, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #27272a;
+            color: var(--texto-claro);
+            border: 1px solid var(--borda-glass);
+        }
+
+        .btn-secondary:hover {
+            background: #3f3f46;
+            color: #fff;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--borda-glass);
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--borda-glass);
+            color: var(--texto-mutado);
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .btn-action:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--texto-claro);
+        }
+
+        /* ==========================================================================
+           5. CARDS DE RESULTADO (GLOW E TABELAS)
+           ========================================================================== */
+        .result-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            color: var(--texto-mutado);
+            text-align: center;
+        }
+
+        .result-placeholder .icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.2;
+        }
+
+        .result-container {
+            display: none;
+        }
+
+        .result-container.active {
+            display: block;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .result-card {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--borda-glass);
+            padding: 16px;
+            border-radius: 10px;
+            transition: var(--transicao-suave);
+        }
+
+        .result-card.full-width {
+            grid-column: span 2;
+        }
+
+        .result-card.highlight {
+            border-color: rgba(0, 255, 153, 0.3);
+            background: linear-gradient(135deg, rgba(0,255,153,0.02) 0%, rgba(0,0,0,0) 100%);
+            box-shadow: 0 0 15px rgba(0, 255, 153, 0.03);
+        }
+
+        .result-card .label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--texto-mutado);
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .result-card .value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--texto-claro);
+        }
+
+        .result-card.highlight .value {
+            color: var(--verde-neon);
+            text-shadow: 0 0 10px var(--verde-glow);
+            font-size: 1.5rem;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            width: 100%;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--borda-glass);
+        }
+
+        .table-custom {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .table-custom th {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 14px 16px;
+            font-weight: 600;
+            color: var(--texto-mutado);
+            border-bottom: 1px solid var(--borda-glass);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+        .table-custom td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            color: var(--texto-claro);
+            font-weight: 500;
+        }
+
+        .table-custom tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table-custom .row-total {
+            background: rgba(0, 255, 153, 0.02);
+            font-weight: 700;
+        }
+
+        .table-custom .row-total td {
+            color: var(--verde-neon);
+            border-top: 1px solid rgba(0, 255, 153, 0.2);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1c1917;
+            border: 1px solid var(--verde-neon);
+            color: #fff;
+            padding: 14px 24px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 15px var(--verde-glow);
+            z-index: 2000;
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* ==========================================================================
+           6. RESPONSIVIDADE (MEDIA QUERIES)
+           ========================================================================== */
+        @media (max-width: 1024px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .mobile-header {
+                display: flex;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                top: 60px;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 90px 20px 40px 20px;
+            }
+
+            .btn-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .result-card.full-width {
+                grid-column: span 1;
+            }
+        }
+
+        @media print {
+            body {
+                background: #fff !important;
+                color: #000 !important;
+            }
+            .sidebar, .mobile-header, .panel-form, .action-bar, .btn-group {
+                display: none !important;
+            }
+            .main-content {
+                margin-left: 0 !important;
+                padding: 0 !important;
+            }
+            .panel-result {
+                background: #fff !important;
+                border: none !important;
+                box-shadow: none !important;
+                color: #000 !important;
+                display: block !important;
+                width: 100% !important;
+            }
+            .result-container {
+                display: block !important;
+            }
+            .result-card {
+                border: 1px solid #000 !important;
+                color: #000 !important;
+                background: #fff !important;
+            }
+            .result-card .value, .result-card.highlight .value {
+                color: #000 !important;
+                text-shadow: none !important;
+            }
+            .table-custom th, .table-custom td {
+                color: #000 !important;
+                border-bottom: 1px solid #000 !important;
+            }
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="container">
+    <!-- Header Mobile -->
+    <div class="mobile-header">
+        <div class="sidebar-brand"><span>Portal</span>Fiscal</div>
+        <button class="btn-menu-toggle" id="menuToggle" aria-label="Abrir Menu">☰</button>
+    </div>
 
-<h1>CALCULADORA DIFAL GOIÁS</h1>
+    <!-- Menu Lateral Principal -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <span>Portal</span>Fiscal
+        </div>
+        <ul class="sidebar-menu">
+            <li><a class="menu-item active" data-target="home"><span class="icon">🏠</span> Início</a></li>
+            <li><a class="menu-item" data-target="difal"><span class="icon">🧮</span> Calculadora DIFAL</a></li>
+            <li><a class="menu-item" data-target="fatorr"><span class="icon">📈</span> Simulador Fator R</a></li>
+            <li><a class="menu-item" data-target="rateiodas"><span class="icon">💰</span> Rateio DAS</a></li>
+            <li><a class="menu-item disabled"><span class="icon">🚧</span> ICMS ST <span class="badge">breve</span></a></li>
+            <li><a class="menu-item disabled"><span class="icon">🚧</span> Simples Nac. <span class="badge">breve</span></a></li>
+            <li><a class="menu-item disabled"><span class="icon">🚧</span> Lucro Pres. <span class="badge">breve</span></a></li>
+            <li><a class="menu-item disabled"><span class="icon">🚧</span> Lucro Real <span class="badge">breve</span></a></li>
+        </ul>
+    </nav>
 
-<p class="subtitulo">
-Uso e Consumo - Base Majorada
-</p>
+    <!-- Área de Conteúdo Principal -->
+    <main class="main-content">
 
-<label>Valor Contábil (R$)</label>
-<input
-type="number"
-id="valor"
-step="0.01"
-placeholder="0,00">
+        <!-- SEÇÃO: HOME / VISÃO GERAL -->
+        <section id="pane-home" class="section-panel active">
+            <div class="section-header">
+                <h1>Painel de Ferramentas</h1>
+                <p>Selecione um dos módulos fiscais avançados abaixo para iniciar as operações.</p>
+            </div>
+            <div class="home-grid">
+                <div class="card-home" onclick="switchSection('difal')">
+                    <h3><span>🧮</span> Calculadora DIFAL</h3>
+                    <p>Cálculo automático do diferencial de alíquota para operações destinadas a Goiás com base majorada por dentro.</p>
+                </div>
+                <div class="card-home" onclick="switchSection('fatorr')">
+                    <h3><span>📈</span> Simulador Fator R</h3>
+                    <p>Planejamento de folha de pagamento ideal para enquadramento no Anexo III do Simples Nacional.</p>
+                </div>
+                <div class="card-home" onclick="switchSection('rateiodas')">
+                    <h3><span>💰</span> Rateio DAS</h3>
+                    <p>Divisão proporcional e transparente do Documento de Arrecadação Simplificado entre múltiplos sócios.</p>
+                </div>
+            </div>
+        </section>
 
-<label>Alíquota Interestadual (%)</label>
-<input
-type="number"
-id="aliquota"
-step="0.01"
-placeholder="Ex.: 4, 7 ou 12">
+        <!-- SEÇÃO: CALCULADORA DIFAL -->
+        <section id="pane-difal" class="section-panel">
+            <div class="section-header">
+                <h1>DIFAL Goiás</h1>
+                <p>Cálculo do Diferencial de Alíquota utilizando a metodologia de base majorada (embutida).</p>
+            </div>
+            <div class="workspace-grid">
+                <!-- Formulário -->
+                <div class="panel-form">
+                    <div class="panel-title">Parâmetros de Entrada</div>
+                    <form id="form-difal" onsubmit="return false;">
+                        <div class="form-group">
+                            <label>Valor Contábil (Operação)</label>
+                            <div class="input-wrapper">
+                                <span class="input-prefix">R$</span>
+                                <input type="text" id="difal-valor" class="form-control form-control-prefix money-mask" placeholder="0,00" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Alíquota Interestadual</label>
+                            <select id="difal-aliquota-inter" class="form-control" required>
+                                <option value="4">4,00% (Importados / Resolução 13)</option>
+                                <option value="7">7,00% (Origem Sul/Sudeste exceto ES)</option>
+                                <option value="12" selected>12,00% (Origem Centro-Oeste/Norte/Nordeste e ES)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Alíquota Interna (Goiás)</label>
+                            <div class="input-wrapper">
+                                <input type="text" class="form-control" value="19,00%" disabled>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-primary" onclick="calcularDifal()">Calcular</button>
+                            <button type="button" class="btn btn-secondary" onclick="limparPainel('difal')">Limpar</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- Resultado -->
+                <div class="panel-result" id="result-difal">
+                    <div class="panel-title">Memória de Cálculo</div>
+                    <div class="result-placeholder">
+                        <div class="icon">📊</div>
+                        <p>Preencha os campos obrigatórios e clique em Calcular para exibir os resultados fiscais.</p>
+                    </div>
+                    <div class="result-container">
+                        <div class="result-grid">
+                            <div class="result-card">
+                                <div class="label">Base Majorada (19% por dentro)</div>
+                                <div class="value" id="res-difal-base">R$ 0,00</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="label">Diferença de Alíquotas</div>
+                                <div class="value" id="res-difal-dif-aliq">0,00%</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="label">ICMS Destino (Goiás)</div>
+                                <div class="value" id="res-difal-icms-go">R$ 0,00</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="label">ICMS Origem (Interestadual)</div>
+                                <div class="value" id="res-difal-icms-inter">R$ 0,00</div>
+                            </div>
+                            <div class="result-card full-width highlight">
+                                <div class="label">Valor Líquido do DIFAL a Recolher</div>
+                                <div class="value" id="res-difal-total">R$ 0,00</div>
+                            </div>
+                        </div>
+                        <div class="action-bar">
+                            <button class="btn-action" onclick="copiarTexto('result-difal')">📋 Copiar Dados</button>
+                            <button class="btn-action" onclick="window.print()">🖨️ Imprimir</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-<div class="botoes">
-<button onclick="calcular()">CALCULAR</button>
-<button onclick="limpar()">LIMPAR</button>
-</div>
+        <!-- SEÇÃO: SIMULADOR FATOR R -->
+        <section id="pane-fatorr" class="section-panel">
+            <div class="section-header">
+                <h1>Simulador Fator R</h1>
+                <p>Determine com precisão cirúrgica a folha necessária para migrar do Anexo IV para o Anexo III.</p>
+            </div>
+            <div class="workspace-grid">
+                <!-- Formulário -->
+                <div class="panel-form">
+                    <div class="panel-title">Histórico Fiscal (Últimos Meses)</div>
+                    <form id="form-fatorr" onsubmit="return false;">
+                        <div class="form-group">
+                            <label>Faturamento Acumulado (Últimos 12 meses)</label>
+                            <div class="input-wrapper">
+                                <span class="input-prefix">R$</span>
+                                <input type="text" id="fator-fat12" class="form-control form-control-prefix money-mask" placeholder="0,00" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Folha de Pagamento Acumulada (Últimos 11 meses)</label>
+                            <div class="input-wrapper">
+                                <span class="input-prefix">R$</span>
+                                <input type="text" id="fator-folha11" class="form-control form-control-prefix money-mask" placeholder="0,00" required>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-primary" onclick="calcularFatorR()">Calcular</button>
+                            <button type="button" class="btn btn-secondary" onclick="limparPainel('fatorr')">Limpar</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- Resultado -->
+                <div class="panel-result" id="result-fatorr">
+                    <div class="panel-title">Planejamento Salarial</div>
+                    <div class="result-placeholder">
+                        <div class="icon">📈</div>
+                        <p>Forneça os valores acumulados para projetar o encargo trabalhista mínimo exigido por lei.</p>
+                    </div>
+                    <div class="result-container">
+                        <div class="result-grid">
+                            <div class="result-card">
+                                <div class="label">Meta Fator R Mínimo</div>
+                                <div class="value">28,01%</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="label">Receita Bruta Projetada</div>
+                                <div class="value" id="res-fator-fat">R$ 0,00</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="label">Massa Salarial Prévia (11m)</div>
+                                <div class="value" id="res-fator-folha11">R$ 0,00</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="label">Meta Total da Folha (12m)</div>
+                                <div class="value" id="res-fator-meta">R$ 0,00</div>
+                            </div>
+                            <div class="result-card full-width highlight">
+                                <div class="label">Folha Mínima Exigida no Mês Atual</div>
+                                <div class="value" id="res-fator-necessaria">R$ 0,00</div>
+                            </div>
+                        </div>
+                        <div class="action-bar">
+                            <button class="btn-action" onclick="copiarTexto('result-fatorr')">📋 Copiar Dados</button>
+                            <button class="btn-action" onclick="window.print()">🖨️ Imprimir</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-<div class="resultado">
+        <!-- SEÇÃO: RATEIO DO DAS -->
+        <section id="pane-rateiodas" class="section-panel">
+            <div class="section-header">
+                <h1>Rateio do DAS</h1>
+                <p>Distribua o valor total da guia unificada Simples Nacional proporcionalmente ao faturamento de cada sócio.</p>
+            </div>
+            <div class="workspace-grid">
+                <!-- Formulário -->
+                <div class="panel-form">
+                    <div class="panel-title">Receitas Individuais e Guia</div>
+                    <form id="form-rateio" onsubmit="return false;">
+                        <div class="form-group">
+                            <label>Receita Mateus</label>
+                            <div class="input-wrapper">
+                                <span class="input-prefix">R$</span>
+                                <input type="text" id="rateio-rec-mateus" class="form-control form-control-prefix money-mask" placeholder="0,00" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Receita Marcelo</label>
+                            <div class="input-wrapper">
+                                <span class="input-prefix">R$</span>
+                                <input type="text" id="rateio-rec-marcelo" class="form-control form-control-prefix money-mask" placeholder="0,00" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Receita Amanda</label>
+                            <div class="input-wrapper">
+                                <span class="input-prefix">R$</span>
+                                <input type="text" id="rateio-rec-amanda" class="form-control form-control-prefix money-mask" placeholder="0,00" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Receita Henrique</label>
+                            <div class="input-wrapper">
+                                <span class="input-prefix">R$</span>
+                                <input type="text" id="rateio-rec-henrique" class="form-control form-control-prefix money-mask" placeholder="0,00" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Valor Total da Guia DAS</label>
+                            <div class="input-wrapper">
+                                <span class="input-prefix">R$</span>
+                                <input type="text" id="rateio-das-total" class="form-control form-control-prefix money-mask" placeholder="0,00" required>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-primary" onclick="calcularRateio()">Calcular</button>
+                            <button type="button" class="btn btn-secondary" onclick="limparPainel('rateiodas')">Limpar</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- Resultado -->
+                <div class="panel-result" id="result-rateiodas">
+                    <div class="panel-title">Relatório de Partilha de Impostos</div>
+                    <div class="result-placeholder">
+                        <div class="icon">💰</div>
+                        <p>Insira as receitas individuais e o montante consolidado do DAS para gerar o rateio.</p>
+                    </div>
+                    <div class="result-container">
+                        <div class="table-responsive">
+                            <table class="table-custom">
+                                <thead>
+                                    <tr>
+                                        <th>Sócio</th>
+                                        <th>Receita</th>
+                                        <th>Percentual</th>
+                                        <th>Valor a Pagar</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-rateio-rows">
+                                    <!-- Conteúdo Dinâmico JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="action-bar">
+                            <button class="btn-action" onclick="copiarTexto('result-rateiodas')">📋 Copiar Dados</button>
+                            <button class="btn-action" onclick="window.print()">🖨️ Imprimir</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-<div class="card">
-Base Majorada
-<span id="base">R$ 0,00</span>
-</div>
+    </main>
 
-<div class="card">
-ICMS Goiás (19%)
-<span id="icmsgo">19,00%</span>
-</div>
+    <!-- Sistema Global de Toast -->
+    <div class="toast" id="toast">
+        <span id="toast-icon">✓</span> <span id="toast-message">Ação realizada!</span>
+    </div>
 
-<div class="card">
-ICMS Interestadual
-<span id="icmsinter">0,00%</span>
-</div>
+    <!-- ==========================================================================
+       7. ENGENHARIA DE JAVASCRIPT (LÓGICA, MÁSCARAS E NEGÓCIO)
+       ========================================================================== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            initMenu();
+            initMasks();
+            initGlobalShortcuts();
+        });
 
-<div class="card">
-Diferença de Alíquota
-<span id="diferenca">0,00%</span>
-</div>
+        function initMenu() {
+            const menuItems = document.querySelectorAll('.menu-item:not(.disabled)');
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
 
-<div class="total">
+            menuItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    const target = item.getAttribute('data-target');
+                    switchSection(target);
+                    if(window.innerWidth <= 768) {
+                        sidebar.classList.remove('open');
+                    }
+                });
+            });
 
-DIFAL A RECOLHER
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+            });
+        }
 
-<br><br>
+        function switchSection(targetId) {
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+                if(item.getAttribute('data-target') === targetId) {
+                    item.classList.add('active');
+                }
+            });
 
-<span id="difal">
-R$ 0,00
-</span>
+            document.querySelectorAll('.section-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            const activePanel = document.getElementById(`pane-${targetId}`);
+            if(activePanel) activePanel.classList.add('active');
+        }
 
-</div>
+        function initMasks() {
+            const moneyInputs = document.querySelectorAll('.money-mask');
+            moneyInputs.forEach(input => {
+                input.addEventListener('input', (e) => {
+                    let value = e.target.value.replace(/\D/g, "");
+                    if(value === "") {
+                        e.target.value = "";
+                        return;
+                    }
+                    value = (parseInt(value) / 100).toFixed(2);
+                    e.target.value = formatCurrencyValue(value);
+                });
+            });
+        }
 
-</div>
+        function formatCurrencyValue(value) {
+            return parseFloat(value).toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
 
-</div>
+        function parseLocaleFloat(valueString) {
+            if (!valueString) return 0;
+            let cleanValue = valueString.replace(/\./g, '').replace(',', '.');
+            return parseFloat(cleanValue) || 0;
+        }
 
-<script>
+        function formatPercentValue(value) {
+            return value.toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }) + '%';
+        }
 
-const ALIQUOTA_GO = 19;
+        function initGlobalShortcuts() {
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const activePanel = document.querySelector('.section-panel.active');
+                    if (!activePanel) return;
+                    
+                    const id = activePanel.id;
+                    if (id === 'pane-difal') calcularDifal();
+                    else if (id === 'pane-fatorr') calcularFatorR();
+                    else if (id === 'pane-rateiodas') calcularRateio();
+                }
+            });
+        }
 
-function moeda(valor){
+        function toggleResultState(panelId, hasData) {
+            const panel = document.getElementById(`result-${panelId}`);
+            if(!panel) return;
+            const placeholder = panel.querySelector('.result-placeholder');
+            const container = panel.querySelector('.result-container');
 
-    return valor.toLocaleString('pt-BR',{
-        style:'currency',
-        currency:'BRL'
-    });
+            if(hasData) {
+                placeholder.style.display = 'none';
+                container.classList.add('active');
+            } else {
+                placeholder.style.display = 'flex';
+                container.classList.remove('active');
+            }
+        }
 
-}
+        function copiarTexto(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
 
-function percentual(valor){
+            let textToCopy = "";
+            const table = container.querySelector('table');
+            
+            if(table) {
+                const rows = table.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('th, td');
+                    let rowText = [];
+                    cells.forEach(cell => rowText.push(cell.innerText.trim()));
+                    textToCopy += rowText.join('\t') + '\n';
+                });
+            } else {
+                const cards = container.querySelectorAll('.result-card');
+                cards.forEach(card => {
+                    const label = card.querySelector('.label').innerText;
+                    const value = card.querySelector('.value').innerText;
+                    textToCopy += `${label}: ${value}\n`;
+                });
+            }
 
-    return valor.toFixed(2).replace(".",",")+"%";
+            navigator.clipboard.writeText(textToCopy.trim()).then(() => {
+                showToast("Dados copiados para a área de transferência!");
+            }).catch(() => {
+                showToast("Erro ao tentar copiar dados.", true);
+            });
+        }
 
-}
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            const msg = document.getElementById('toast-message');
 
-function calcular(){
+            icon.innerText = isError ? "✕" : "✓";
+            toast.style.borderColor = isError ? "#ef4444" : "var(--verde-neon)";
+            toast.style.boxShadow = isError ? "0 10px 30px rgba(0,0,0,0.5), 0 0 15px rgba(239,68,68,0.2)" : "0 10px 30px rgba(0,0,0,0.5), 0 0 15px var(--verde-glow)";
+            msg.innerText = message;
+            
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3500);
+        }
 
-    let valor = parseFloat(document.getElementById("valor").value);
+        function limparPainel(type) {
+            const form = document.getElementById(`form-${type}`);
+            if (form) form.reset();
+            toggleResultState(type, false);
+            showToast("Campos redefinidos.");
+        }
 
-    let aliqInter = parseFloat(document.getElementById("aliquota").value);
+        function calcularDifal() {
+            const valorContabil = parseLocaleFloat(document.getElementById('difal-valor').value);
+            const aliqInter = parseFloat(document.getElementById('difal-aliquota-inter').value);
+            const aliqInternaFixed = 19;
 
-    if(isNaN(valor) || isNaN(aliqInter)){
+            if (valorContabil <= 0) {
+                showToast("Informe um valor contábil superior a zero.", true);
+                return;
+            }
 
-        alert("Informe todos os campos.");
+            const baseMajorada = valorContabil / 0.81;
+            const diferencaAliquota = aliqInternaFixed - aliqInter;
+            const icmsOrigem = valorContabil * (aliqInter / 100);
+            const icmsDestinoInterno = baseMajorada * (aliqInternaFixed / 100);
+            const valorDifal = baseMajorada * (diferencaAliquota / 100);
 
-        return;
+            document.getElementById('res-difal-base').innerText = "R$ " + formatCurrencyValue(baseMajorada);
+            document.getElementById('res-difal-dif-aliq').innerText = formatPercentValue(diferencaAliquota);
+            document.getElementById('res-difal-icms-go').innerText = "R$ " + formatCurrencyValue(icmsDestinoInterno);
+            document.getElementById('res-difal-icms-inter').innerText = "R$ " + formatCurrencyValue(icmsOrigem);
+            document.getElementById('res-difal-total').innerText = "R$ " + formatCurrencyValue(valorDifal);
 
-    }
+            toggleResultState('difal', true);
+        }
 
-    // Base majorada
-    let base = valor / 0.81;
+        function calcularFatorR() {
+            const fatAcumulado = parseLocaleFloat(document.getElementById('fator-fat12').value);
+            const folhaAcumulada11 = parseLocaleFloat(document.getElementById('fator-folha11').value);
 
-    // Diferença das alíquotas
-    let diferenca = ALIQUOTA_GO - aliqInter;
+            if (fatAcumulado <= 0) {
+                showToast("O faturamento acumulado deve ser maior que zero.", true);
+                return;
+            }
 
-    // DIFAL
-    let difal = base * (diferenca/100);
+            const metaFolha12Meses = fatAcumulado * 0.2801;
+            const folhaMesAtualNecessaria = metaFolha12Meses - folhaAcumulada11;
+            const resultadoFinalExibicao = folhaMesAtualNecessaria < 0 ? 0 : folhaMesAtualNecessaria;
 
-    document.getElementById("base").innerHTML = moeda(base);
+            document.getElementById('res-fator-fat').innerText = "R$ " + formatCurrencyValue(fatAcumulado);
+            document.getElementById('res-fator-folha11').innerText = "R$ " + formatCurrencyValue(folhaAcumulada11);
+            document.getElementById('res-fator-meta').innerText = "R$ " + formatCurrencyValue(metaFolha12Meses);
+            document.getElementById('res-fator-necessaria').innerText = "R$ " + formatCurrencyValue(resultadoFinalExibicao);
 
-    document.getElementById("icmsgo").innerHTML = percentual(ALIQUOTA_GO);
+            if(folhaMesAtualNecessaria <= 0) {
+                document.getElementById('res-fator-necessaria').innerText = "R$ 0,00 (Fator R já atingido)";
+            }
 
-    document.getElementById("icmsinter").innerHTML = percentual(aliqInter);
+            toggleResultState('fatorr', true);
+        }
 
-    document.getElementById("diferenca").innerHTML = percentual(diferenca);
+        function calcularRateio() {
+            const recMateus = parseLocaleFloat(document.getElementById('rateio-rec-mateus').value);
+            const recMarcelo = parseLocaleFloat(document.getElementById('rateio-rec-marcelo').value);
+            const recAmanda = parseLocaleFloat(document.getElementById('rateio-rec-amanda').value);
+            const recHenrique = parseLocaleFloat(document.getElementById('rateio-rec-henrique').value);
+            const valorDasGuia = parseLocaleFloat(document.getElementById('rateio-das-total').value);
 
-    document.getElementById("difal").innerHTML = moeda(difal);
+            const totalReceitas = recMateus + recMarcelo + recAmanda + recHenrique;
 
-}
+            if (totalReceitas <= 0) {
+                showToast("A soma das receitas deve ser superior a zero.", true);
+                return;
+            }
+            if (valorDasGuia <= 0) {
+                showToast("Informe o valor total da guia DAS.", true);
+                return;
+            }
 
-function limpar(){
+            const socios = [
+                { nome: "Mateus", receita: recMateus },
+                { nome: "Marcelo", receita: recMarcelo },
+                { nome: "Amanda", receita: recAmanda },
+                { nome: "Henrique", receita: recHenrique }
+            ];
 
-    document.getElementById("valor").value="";
+            const tbody = document.getElementById('table-rateio-rows');
+            tbody.innerHTML = "";
 
-    document.getElementById("aliquota").value="";
+            socios.forEach(socio => {
+                const percentualPartilha = (socio.receita / totalReceitas) * 100;
+                const valorIndividualPagar = valorDasGuia * (percentualPartilha / 100);
 
-    document.getElementById("base").innerHTML="R$ 0,00";
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${socio.nome}</td>
+                    <td>R$ ${formatCurrencyValue(socio.receita)}</td>
+                    <td>${formatPercentValue(percentualPartilha)}</td>
+                    <td>R$ ${formatCurrencyValue(valorIndividualPagar)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
 
-    document.getElementById("icmsgo").innerHTML="19,00%";
+            const trTotal = document.createElement('tr');
+            trTotal.className = "row-total";
+            trTotal.innerHTML = `
+                <td>TOTAL</td>
+                <td>R$ ${formatCurrencyValue(totalReceitas)}</td>
+                <td>100,00%</td>
+                <td>R$ ${formatCurrencyValue(valorDasGuia)}</td>
+            `;
+            tbody.appendChild(trTotal);
 
-    document.getElementById("icmsinter").innerHTML="0,00%";
-
-    document.getElementById("diferenca").innerHTML="0,00%";
-
-    document.getElementById("difal").innerHTML="R$ 0,00";
-
-}
-
-document.addEventListener("keypress",function(e){
-
-    if(e.key==="Enter"){
-
-        calcular();
-
-    }
-
-});
-
-</script>
-
+            toggleResultState('rateiodas', true);
+        }
+    </script>
 </body>
 </html>
