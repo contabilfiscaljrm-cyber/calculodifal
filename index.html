@@ -270,9 +270,12 @@
             align-items: start;
         }
 
-        /* Expansão inteligente da grid para acomodar a tabela horizontal estendida */
         .workspace-grid.wide-result {
             grid-template-columns: 400px 1fr;
+        }
+
+        .workspace-grid.full-width-layout {
+            grid-template-columns: 1fr;
         }
 
         @media (max-width: 1250px) {
@@ -300,6 +303,39 @@
             display: flex;
             align-items: center;
             gap: 8px;
+        }
+
+        /* Area de Drop XML */
+        .upload-container {
+            border: 2px dashed #27272a;
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.2);
+            transition: var(--transicao-suave);
+            margin-bottom: 20px;
+        }
+
+        .upload-container:hover, .upload-container.dragover {
+            border-color: var(--verde-neon);
+            background: rgba(0, 255, 153, 0.02);
+            box-shadow: 0 0 15px rgba(0, 255, 153, 0.05);
+        }
+
+        .upload-container .icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .upload-container p {
+            color: var(--texto-mutado);
+            font-size: 0.95rem;
+        }
+
+        .upload-container b {
+            color: var(--verde-neon);
         }
 
         /* ==========================================================================
@@ -435,7 +471,7 @@
         }
 
         /* ==========================================================================
-           5. CARDS DE RESULTADO (GLOW E TABELAS HORIZONTAIS)
+           5. CARDS DE RESULTADO AND MATRIZ HORIZONTAL
            ========================================================================== */
         .result-placeholder {
             display: flex;
@@ -521,7 +557,6 @@
             font-size: 0.9rem;
         }
 
-        /* Cabeçalhos superiores com fundo azul escuro/petróleo conforme solicitado */
         .table-custom th {
             background: #0d2a4a;
             padding: 14px 16px;
@@ -534,8 +569,8 @@
             text-align: center;
         }
 
-        /* Primeira coluna descritiva com visual de categoria fixa */
-        .table-custom td:first-child {
+        /* Primeira coluna descritiva para Rateio */
+        .table-custom.matrix-mode td:first-child {
             background: rgba(255, 255, 255, 0.02);
             font-weight: 700;
             color: var(--texto-claro);
@@ -543,6 +578,16 @@
             font-size: 0.8rem;
             letter-spacing: 0.5px;
             width: 180px;
+            text-align: left;
+        }
+
+        /* Modo de listagem comum (XML) */
+        .table-custom.list-mode th {
+            text-align: left;
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--texto-mutado);
+        }
+        .table-custom.list-mode td {
             text-align: left;
         }
 
@@ -554,18 +599,16 @@
             text-align: center;
         }
 
-        /* Estilização Neon na linha de Salário Proporcional */
         .table-custom tr.row-highlight-neon td {
             color: var(--verde-neon);
             font-weight: 700;
             text-shadow: 0 0 10px var(--verde-glow);
         }
-        .table-custom tr.row-highlight-neon td:first-child {
+        .table-custom.matrix-mode tr.row-highlight-neon td:first-child {
             color: var(--texto-claro);
             text-shadow: none;
         }
 
-        /* Coluna final de fechamento (TOTAL) */
         .table-custom th.col-total-header {
             background: #0052a3;
         }
@@ -687,13 +730,11 @@
 </head>
 <body>
 
-    <!-- Header Mobile -->
     <div class="mobile-header">
         <div class="sidebar-brand"><span>Portal</span>Fiscal</div>
         <button class="btn-menu-toggle" id="menuToggle" aria-label="Abrir Menu">☰</button>
     </div>
 
-    <!-- Menu Lateral Principal -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <span>Portal</span>Fiscal
@@ -703,6 +744,7 @@
             <li><a class="menu-item" data-target="difal"><span class="icon">🧮</span> Calculadora DIFAL</a></li>
             <li><a class="menu-item" data-target="fatorr"><span class="icon">📈</span> Simulador Fator R</a></li>
             <li><a class="menu-item" data-target="rateiodas"><span class="icon">💰</span> Rateio DAS</a></li>
+            <li><a class="menu-item" data-target="xml"><span class="icon">📁</span> Analisador XML</a></li>
             <li><a class="menu-item disabled"><span class="icon">🚧</span> ICMS ST <span class="badge">breve</span></a></li>
             <li><a class="menu-item disabled"><span class="icon">🚧</span> Simples Nac. <span class="badge">breve</span></a></li>
             <li><a class="menu-item disabled"><span class="icon">🚧</span> Lucro Pres. <span class="badge">breve</span></a></li>
@@ -710,10 +752,8 @@
         </ul>
     </nav>
 
-    <!-- Área de Conteúdo Principal -->
     <main class="main-content">
 
-        <!-- SEÇÃO: HOME / VISÃO GERAL -->
         <section id="pane-home" class="section-panel active">
             <div class="section-header">
                 <h1>Painel de Ferramentas</h1>
@@ -732,10 +772,13 @@
                     <h3><span>💰</span> Rateio DAS e Folha</h3>
                     <p>Divisão proporcional do DAS e cálculo de salários homologados dispostos em matriz horizontal de sócios.</p>
                 </div>
+                <div class="card-home" onclick="switchSection('xml')">
+                    <h3><span>📁</span> Analisador XML</h3>
+                    <p>Carregue notas fiscais eletrônicas em lote para extrair resumos de faturamento e impostos automaticamente.</p>
+                </div>
             </div>
         </section>
 
-        <!-- SEÇÃO: CALCULADORA DIFAL -->
         <section id="pane-difal" class="section-panel">
             <div class="section-header">
                 <h1>DIFAL Goiás</h1>
@@ -810,7 +853,6 @@
             </div>
         </section>
 
-        <!-- SEÇÃO: SIMULADOR FATOR R -->
         <section id="pane-fatorr" class="section-panel">
             <div class="section-header">
                 <h1>Simulador Fator R</h1>
@@ -878,11 +920,10 @@
             </div>
         </section>
 
-        <!-- SEÇÃO: RATEIO DO DAS E DA FOLHA -->
         <section id="pane-rateiodas" class="section-panel">
             <div class="section-header">
                 <h1>Rateio do DAS e Folha</h1>
-                <p>Distribuição do DAS e Pro-labore baseada em matriz horizontal paritária corporativa.</p>
+                <p>Distribuição do DAS e Pró-labore baseada em matriz horizontal paritária corporativa.</p>
             </div>
             <div class="workspace-grid wide-result">
                 <div class="panel-form">
@@ -951,7 +992,7 @@
                     </div>
                     <div class="result-container">
                         <div class="table-responsive">
-                            <table class="table-custom">
+                            <table class="table-custom matrix-mode">
                                 <thead>
                                     <tr>
                                         <th>SOCIOS</th>
@@ -1012,15 +1053,77 @@
             </div>
         </section>
 
+        <section id="pane-xml" class="section-panel">
+            <div class="section-header">
+                <h1>Analisador de Lote XML NF-e</h1>
+                <p>Processe múltiplos arquivos XML de uma vez para consolidação imediata de entradas, saídas e tributos sem banco de dados.</p>
+            </div>
+            <div class="workspace-grid full-width-layout">
+                <div class="panel-form">
+                    <div class="panel-title">Upload de Arquivos Digitalizados</div>
+                    
+                    <div class="upload-container" id="xml-dropzone" onclick="document.getElementById('xml-file-input').click()">
+                        <span class="icon">📁</span>
+                        <p>Arraste múltiplos arquivos XML aqui ou <b>clique para navegar</b></p>
+                        <input type="file" id="xml-file-input" multiple accept=".xml" style="display:none" onchange="processarArquivosXml(this.files)">
+                    </div>
+
+                    <div class="btn-group" style="grid-template-columns: 1fr;">
+                        <button type="button" class="btn btn-secondary" onclick="limparPainelXml()">Limpar Lote Atual</button>
+                    </div>
+                </div>
+
+                <div class="panel-result" id="result-xml">
+                    <div class="panel-title">Painel Geral Consolidado</div>
+                    
+                    <div class="result-placeholder" id="xml-placeholder">
+                        <div class="icon">📑</div>
+                        <p>Carregue os arquivos acima para preencher o grid contábil.</p>
+                    </div>
+
+                    <div class="result-container" id="xml-container">
+                        <div class="result-grid">
+                            <div class="result-card">
+                                <div class="label">Total de Documentos</div>
+                                <div class="value" id="xml-card-qtd">0</div>
+                            </div>
+                            <div class="result-card highlight">
+                                <div class="label">Valor Total do Lote</div>
+                                <div class="value" id="xml-card-total">R$ 0,00</div>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table-custom list-mode">
+                                <thead>
+                                    <tr>
+                                        <th>Número</th>
+                                        <th>Data Emissão</th>
+                                        <th>Emitente</th>
+                                        <th>Destinatário</th>
+                                        <th>Valor da Nota</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-xml-rows">
+                                    </tbody>
+                            </table>
+                        </div>
+
+                        <div class="action-bar">
+                            <button class="btn-action" onclick="copiarTexto('result-xml')">📋 Copiar Relatório</button>
+                            <button class="btn-action" onclick="window.print()">🖨️ Imprimir</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <div class="toast" id="toast">
         <span id="toast-icon">✓</span> <span id="toast-message">Ação realizada!</span>
     </div>
 
-    <!-- ==========================================================================
-       7. ENGENHARIA DE JAVASCRIPT (LÓGICA, MÁSCARAS E NEGÓCIO)
-       ========================================================================== -->
     <script>
         let folhaMinimaCalculadaGlobal = 0;
 
@@ -1028,6 +1131,7 @@
             initMenu();
             initMasks();
             initGlobalShortcuts();
+            initXmlDragAndDrop();
         });
 
         function initMenu() {
@@ -1261,7 +1365,6 @@
                 return;
             }
 
-            // Mapeamento ordenado dos 5 sócios para vinculação direta com as colunas do padrão visual
             let sociosData = {
                 mateus: { receita: recMateus, grupo: "A" },
                 anaclara: { receita: recAnaClara, grupo: "A" },
@@ -1270,7 +1373,6 @@
                 henrique: { receita: recHenrique, grupo: "C" }
             };
 
-            // Processamento dos percentuais e valores individuais brutos
             for (let chave in sociosData) {
                 let s = sociosData[chave];
                 s.percentual = (s.receita / totalReceitas) * 100;
@@ -1278,24 +1380,18 @@
                 s.salarioBruto = valorFolhaGlobal * (s.percentual / 100);
             }
 
-            // Aplicação da regra de homologação paritária por grupos
-            // Grupo A: Mateus e Ana Clara
             const totalSalGrupoA = sociosData.mateus.salarioBruto + sociosData.anaclara.salarioBruto;
             const divisaoGrupoA = totalSalGrupoA / 2;
-            socijsFinalA = totalReceitas > 0 ? divisaoGrupoA : 0;
 
-            // Grupo B: Marcelo e Amanda
             const totalSalGrupoB = sociosData.marcelo.salarioBruto + sociosData.amanda.salarioBruto;
             const divisaoGrupoB = totalSalGrupoB / 2;
-            socijsFinalB = totalReceitas > 0 ? divisaoGrupoB : 0;
 
             sociosData.mateus.salarioFinal = divisaoGrupoA;
-            boxSalAnaClara = sociosData.anaclara.salarioFinal = divisaoGrupoA;
+            sociosData.anaclara.salarioFinal = divisaoGrupoA;
             sociosData.marcelo.salarioFinal = divisaoGrupoB;
             sociosData.amanda.salarioFinal = divisaoGrupoB;
-            sociosData.henrique.salarioFinal = sociosData.henrique.salarioBruto; // Henrique individual puro
+            sociosData.henrique.salarioFinal = sociosData.henrique.salarioBruto;
 
-            // Injeção de Dados na Tabela Horizontal por colunas estruturadas
             for (let chave in sociosData) {
                 let s = sociosData[chave];
                 document.getElementById(`td-rec-${chave}`).innerText = "R$ " + formatCurrencyValue(s.receita);
@@ -1304,13 +1400,115 @@
                 document.getElementById(`td-sal-${chave}`).innerText = "R$ " + formatCurrencyValue(s.salarioFinal);
             }
 
-            // Atualização da Coluna de Fechamento Contábil (TOTAL)
             document.getElementById('td-rec-total').innerText = "R$ " + formatCurrencyValue(totalReceitas);
             document.getElementById('td-pct-total').innerText = "100,00%";
             document.getElementById('td-das-total').innerText = "R$ " + formatCurrencyValue(valorDasGuia);
             document.getElementById('td-sal-total').innerText = "R$ " + formatCurrencyValue(valorFolhaGlobal);
 
             toggleResultState('rateiodas', true);
+        }
+
+        // ==========================================================================
+        // CONTROLLER: ANALISADOR XML CLIENT-SIDE (NF-e)
+        // ==========================================================================
+        function initXmlDragAndDrop() {
+            const dropzone = document.getElementById('xml-dropzone');
+            if(!dropzone) return;
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    dropzone.classList.add('dragover');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    dropzone.classList.remove('dragover');
+                }, false);
+            });
+
+            dropzone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                processarArquivosXml(files);
+            }, false);
+        }
+
+        function processarArquivosXml(files) {
+            const xmlFiles = Array.from(files).filter(file => file.name.endsWith('.xml'));
+            
+            if(xmlFiles.length === 0) {
+                showToast("Nenhum arquivo .xml válido foi detectado.", true);
+                return;
+            }
+
+            let loteNotasProcessadas = [];
+            let totalGeralLote = 0;
+            let arquivosLeituraContador = 0;
+
+            const tbody = document.getElementById('table-xml-rows');
+            tbody.innerHTML = ""; // Reset de segurança
+
+            xmlFiles.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    arquivosLeituraContador++;
+                    try {
+                        const parser = new DOMParser();
+                        const xmlDoc = parser.parseFromString(e.target.result, "text/xml");
+                        
+                        // Extração de chaves e tags estruturais da NF-e (Padrão SEFAZ)
+                        const nNF = xmlDoc.getElementsByTagName("nNF")[0]?.textContent || "N/A";
+                        const dhEmi = xmlDoc.getElementsByTagName("dhEmi")[0]?.textContent || xmlDoc.getElementsByTagName("dEmi")[0]?.textContent || "N/A";
+                        const xEmi = xmlDoc.getElementsByTagName("xEmit")[0]?.textContent || "Desconhecido";
+                        const xDest = xmlDoc.getElementsByTagName("xDest")[0]?.textContent || "Desconhecido";
+                        const vNF = parseFloat(xmlDoc.getElementsByTagName("vNF")[0]?.textContent || 0);
+
+                        // Formatação simplificada da data de emissão
+                        let dataFormatada = dhEmi !== "N/A" ? dhEmi.substring(0, 10).split('-').reverse().join('/') : "N/A";
+
+                        totalGeralLote += vNF;
+
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${nNF}</td>
+                            <td>${dataFormatada}</td>
+                            <td>${xEmi.substring(0, 25)}${xEmi.length > 25 ? '...' : ''}</td>
+                            <td>${xDest.substring(0, 25)}${xDest.length > 25 ? '...' : ''}</td>
+                            <td>R$ ${formatCurrencyValue(vNF)}</td>
+                        `;
+                        tbody.appendChild(tr);
+
+                    } catch (err) {
+                        console.error("Falha no parsing de um arquivo XML:", err);
+                    }
+
+                    // Se todos os leitores as síncronos finalizaram as threads de leitura
+                    if(arquivosLeituraContador === xmlFiles.length) {
+                        document.getElementById('xml-card-qtd').innerText = arquivosLeituraContador;
+                        document.getElementById('xml-card-total').innerText = "R$ " + formatCurrencyValue(totalGeralLote);
+                        
+                        // Modifica o estado do contêiner para ativo
+                        document.getElementById('xml-placeholder').style.display = 'none';
+                        document.getElementById('xml-container').classList.add('active');
+                        showToast(`Lote processado: ${arquivosLeituraContador} documentos homologados!`);
+                    }
+                };
+                reader.readAsText(file);
+            });
+        }
+
+        function limparPainelXml() {
+            document.getElementById('xml-file-input').value = "";
+            document.getElementById('table-xml-rows').innerHTML = "";
+            document.getElementById('xml-card-qtd').innerText = "0";
+            document.getElementById('xml-card-total').innerText = "R$ 0,00";
+            
+            document.getElementById('xml-placeholder').style.display = 'flex';
+            document.getElementById('xml-container').classList.remove('active');
+            showToast("Lote XML redefinido.");
         }
     </script>
 </body>
