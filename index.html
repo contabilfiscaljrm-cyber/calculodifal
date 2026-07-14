@@ -14,6 +14,8 @@
             --bg-sidebar: #09090b;
             --verde-neon: #00ff99;
             --verde-glow: rgba(0, 255, 153, 0.2);
+            --vermelho-neon: #ff3366;
+            --vermelho-glow: rgba(255, 51, 102, 0.2);
             --azul-detalhe: #0066cc;
             --azul-glow: rgba(0, 102, 204, 0.3);
             --texto-claro: #f4f4f5;
@@ -307,7 +309,7 @@
 
         /* Area de Drop XML */
         .upload-container {
-            border: 2px dashed #27272a;
+            border: 2px dashed var(--azul-detalhe);
             border-radius: 12px;
             padding: 40px 20px;
             text-align: center;
@@ -393,15 +395,6 @@
             background: rgba(0, 0, 0, 0.4);
         }
 
-        select.form-control {
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23a1a1aa' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/\3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: calc(100% - 16px) center;
-            padding-right: 40px;
-        }
-
         .btn-group {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -471,7 +464,7 @@
         }
 
         /* ==========================================================================
-           5. CARDS DE RESULTADO AND MATRIZ HORIZONTAL
+           5. CARDS DE RESULTADO E MATRIZ HORIZONTAL
            ========================================================================== */
         .result-placeholder {
             display: flex;
@@ -497,49 +490,58 @@
             display: block;
         }
 
-        .result-grid {
+        .result-grid-xml {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(5, 1fr);
             gap: 16px;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 1100px) {
+            .result-grid-xml {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .result-grid-xml .result-card:first-child {
+                grid-column: span 2;
+            }
+        }
+        @media (max-width: 600px) {
+            .result-grid-xml {
+                grid-template-columns: 1fr;
+            }
+            .result-grid-xml .result-card:first-child {
+                grid-column: span 1;
+            }
         }
 
         .result-card {
             background: rgba(0, 0, 0, 0.2);
             border: 1px solid var(--borda-glass);
-            padding: 16px;
+            padding: 20px 16px;
             border-radius: 10px;
             transition: var(--transicao-suave);
+            position: relative;
         }
 
-        .result-card.full-width {
-            grid-column: span 2;
-        }
-
-        .result-card.highlight {
-            border-color: rgba(0, 255, 153, 0.3);
-            background: linear-gradient(135deg, rgba(0,255,153,0.02) 0%, rgba(0,0,0,0) 100%);
-            box-shadow: 0 0 15px rgba(0, 255, 153, 0.03);
-        }
+        .result-card.border-green { border-left: 4px solid var(--verde-neon); }
+        .result-card.border-blue { border-left: 4px solid var(--azul-detalhe); }
+        .result-card.border-purple { border-left: 4px solid #a855f7; }
+        .result-card.border-orange { border-left: 4px solid #f97316; }
+        .result-card.border-cyan { border-left: 4px solid #06b6d4; }
 
         .result-card .label {
             font-size: 0.75rem;
             text-transform: uppercase;
             color: var(--texto-mutado);
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             letter-spacing: 0.5px;
+            font-weight: 600;
         }
 
         .result-card .value {
-            font-size: 1.25rem;
+            font-size: 1.35rem;
             font-weight: 700;
             color: var(--texto-claro);
-        }
-
-        .result-card.highlight .value {
-            color: var(--verde-neon);
-            text-shadow: 0 0 10px var(--verde-glow);
-            font-size: 1.5rem;
         }
 
         .table-responsive {
@@ -569,7 +571,6 @@
             text-align: center;
         }
 
-        /* Primeira coluna descritiva para Rateio */
         .table-custom.matrix-mode td:first-child {
             background: rgba(255, 255, 255, 0.02);
             font-weight: 700;
@@ -581,7 +582,6 @@
             text-align: left;
         }
 
-        /* Modo de listagem comum (XML) */
         .table-custom.list-mode th {
             text-align: left;
             background: rgba(255, 255, 255, 0.02);
@@ -619,6 +619,27 @@
         }
         tr.row-highlight-neon td.col-total-value {
             color: var(--verde-neon) !important;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .status-badge.com-ret {
+            background: rgba(0, 255, 153, 0.1);
+            color: var(--verde-neon);
+            border: 1px solid rgba(0, 255, 153, 0.2);
+        }
+
+        .status-badge.sem-ret {
+            background: rgba(255, 51, 102, 0.1);
+            color: var(--vermelho-neon);
+            border: 1px solid rgba(255, 51, 102, 0.2);
         }
 
         .toast {
@@ -745,8 +766,8 @@
             <li><a class="menu-item" data-target="fatorr"><span class="icon">📈</span> Simulador Fator R</a></li>
             <li><a class="menu-item" data-target="rateiodas"><span class="icon">💰</span> Rateio DAS</a></li>
             <li><a class="menu-item" data-target="xml"><span class="icon">📁</span> Analisador XML</a></li>
+            <li><a class="menu-item" data-target="simplesnacional"><span class="icon">📊</span> Simples Nacional</a></li>
             <li><a class="menu-item disabled"><span class="icon">🚧</span> ICMS ST <span class="badge">breve</span></a></li>
-            <li><a class="menu-item disabled"><span class="icon">🚧</span> Simples Nac. <span class="badge">breve</span></a></li>
             <li><a class="menu-item disabled"><span class="icon">🚧</span> Lucro Pres. <span class="badge">breve</span></a></li>
             <li><a class="menu-item disabled"><span class="icon">🚧</span> Lucro Real <span class="badge">breve</span></a></li>
         </ul>
@@ -774,7 +795,11 @@
                 </div>
                 <div class="card-home" onclick="switchSection('xml')">
                     <h3><span>📁</span> Analisador XML</h3>
-                    <p>Carregue notas fiscais eletrônicas em lote para extrair resumos de faturamento e impostos automaticamente.</p>
+                    <p>Carregue notas fiscais eletrônicas em lote para extrair resumos de faturamento, retenções federais (PIS, COFINS, IRRF, CSLL) e status de retenção.</p>
+                </div>
+                <div class="card-home" onclick="switchSection('simplesnacional')">
+                    <h3><span>📊</span> Simples Nacional</h3>
+                    <p>Previsão e cálculo da alíquota efetiva e percentual do ISS para prestadores de serviços do Anexo III.</p>
                 </div>
             </div>
         </section>
@@ -1045,7 +1070,7 @@
                             </table>
                         </div>
                         <div class="action-bar">
-                            <button class="btn-action" onclick="copiarTexto('result-rateiodas')">📋 Copiar Dados</button>
+                            <button class="btn-action" onclick="copyTableToClipboard('result-rateiodas')">📋 Copiar Dados</button>
                             <button class="btn-action" onclick="window.print()">🖨️ Imprimir</button>
                         </div>
                     </div>
@@ -1055,62 +1080,132 @@
 
         <section id="pane-xml" class="section-panel">
             <div class="section-header">
-                <h1>Analisador de Lote XML NF-e</h1>
-                <p>Processe múltiplos arquivos XML de uma vez para consolidação imediata de entradas, saídas e tributos sem banco de dados.</p>
+                <h1>Modelo Organização Contábil</h1>
+                <p>Leitor e Extrator de Retenções Federais (NFS-e / Padrão ABRASF)</p>
             </div>
             <div class="workspace-grid full-width-layout">
                 <div class="panel-form">
                     <div class="panel-title">Upload de Arquivos Digitalizados</div>
-                    
                     <div class="upload-container" id="xml-dropzone" onclick="document.getElementById('xml-file-input').click()">
                         <span class="icon">📁</span>
-                        <p>Arraste múltiplos arquivos XML aqui ou <b>clique para navegar</b></p>
-                        <input type="file" id="xml-file-input" multiple accept=".xml" style="display:none" onchange="processarArquivosXml(this.files)">
+                        <p>Clique aqui ou arraste os arquivos XML das Notas Fiscais</p>
+                        <span style="color: var(--texto-mutado); font-size: 0.85rem;">Você pode selecionar vários arquivos de uma vez</span>
+                        <input type="file" id="xml-file-input" multiple accept=".xml" style="display:none" onchange="dispararProcessamentoXml(this.files)">
                     </div>
-
                     <div class="btn-group" style="grid-template-columns: 1fr;">
                         <button type="button" class="btn btn-secondary" onclick="limparPainelXml()">Limpar Lote Atual</button>
                     </div>
                 </div>
 
                 <div class="panel-result" id="result-xml">
-                    <div class="panel-title">Painel Geral Consolidado</div>
-                    
+                    <div class="panel-title">Resumo Consolidado</div>
                     <div class="result-placeholder" id="xml-placeholder">
                         <div class="icon">📑</div>
-                        <p>Carregue os arquivos acima para preencher o grid contábil.</p>
+                        <p>Carregue os arquivos acima para preencher a matriz de tributos federais retidos.</p>
                     </div>
-
                     <div class="result-container" id="xml-container">
-                        <div class="result-grid">
-                            <div class="result-card">
-                                <div class="label">Total de Documentos</div>
-                                <div class="value" id="xml-card-qtd">0</div>
+                        <div class="result-grid-xml">
+                            <div class="result-card border-green">
+                                <div class="label">Total das Notas</div>
+                                <div class="value" id="tot-notas">R$ 0,00</div>
                             </div>
-                            <div class="result-card highlight">
-                                <div class="label">Valor Total do Lote</div>
-                                <div class="value" id="xml-card-total">R$ 0,00</div>
+                            <div class="result-card border-blue">
+                                <div class="label">Total PIS</div>
+                                <div class="value" id="tot-pis">R$ 0,00</div>
+                            </div>
+                            <div class="result-card border-purple">
+                                <div class="label">Total COFINS</div>
+                                <div class="value" id="tot-cofins">R$ 0,00</div>
+                            </div>
+                            <div class="result-card border-orange">
+                                <div class="label">Total IRRF</div>
+                                <div class="value" id="tot-irrf">R$ 0,00</div>
+                            </div>
+                            <div class="result-card border-cyan">
+                                <div class="label">Total CSLL</div>
+                                <div class="value" id="tot-csll">R$ 0,00</div>
                             </div>
                         </div>
 
+                        <div class="panel-title" style="border-bottom:none; margin-bottom:12px; margin-top:20px;">Detalhamento por Nota Fiscal</div>
                         <div class="table-responsive">
                             <table class="table-custom list-mode">
                                 <thead>
                                     <tr>
-                                        <th>Número</th>
-                                        <th>Data Emissão</th>
-                                        <th>Emitente</th>
-                                        <th>Destinatário</th>
-                                        <th>Valor da Nota</th>
+                                        <th>NFS-e</th>
+                                        <th>Valor (R$)</th>
+                                        <th>PIS (R$)</th>
+                                        <th>COFINS (R$)</th>
+                                        <th>IRRF (R$)</th>
+                                        <th>CSLL (R$)</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
-                                <tbody id="table-xml-rows">
+                                <tbody id="table-body">
                                     </tbody>
                             </table>
                         </div>
-
                         <div class="action-bar">
                             <button class="btn-action" onclick="copiarTexto('result-xml')">📋 Copiar Relatório</button>
+                            <button class="btn-action" onclick="window.print()">🖨️ Imprimir</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="pane-simplesnacional" class="section-panel">
+            <div class="section-header">
+                <h1>Simples Nacional - Previsão ISS</h1>
+                <p>Calcule a alíquota efetiva acumulada e isole o percentual exato de partilha do ISS para prestadores de serviços do Anexo III.</p>
+            </div>
+            <div class="workspace-grid">
+                <div class="panel-form">
+                    <div class="panel-title">Parâmetros de Receita Bruta</div>
+                    <form id="form-simplesnacional" onsubmit="return false;">
+                        <div class="form-group">
+                            <label>Receita Bruta Acumulada (Últimos 12 meses - RBT12)</label>
+                            <div class="input-wrapper">
+                                <span class="input-prefix">R$</span>
+                                <input type="text" id="simples-rbt12" class="form-control form-control-prefix money-mask" placeholder="0,00" required>
+                            </div>
+                        </div>
+                        <div class="btn-group" style="grid-template-columns: 1fr;">
+                            <button type="button" class="btn btn-primary" onclick="calcularSimplesIss()">Calcular Alíquota</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="panel-result" id="result-simplesnacional">
+                    <div class="panel-title">Diagnóstico de Alíquotas Repartidas</div>
+                    <div class="result-placeholder">
+                        <div class="icon">📊</div>
+                        <p>Forneça o RBT12 para simular o enquadramento de faixa e extrair as alíquotas do imposto.</p>
+                    </div>
+                    <div class="result-container">
+                        <div class="result-grid">
+                            <div class="result-card">
+                                <div class="label">Faixa de Enquadramento</div>
+                                <div class="value" id="res-simples-faixa">1ª Faixa</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="label">Alíquota Nominal de Tabela</div>
+                                <div class="value" id="res-simples-nominal">0,00%</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="label">Alíquota Efetiva do Simples (Total)</div>
+                                <div class="value" id="res-simples-efetiva">0,00%</div>
+                            </div>
+                            <div class="result-card">
+                                <div class="label">Percentual de Repartição do ISS</div>
+                                <div class="value" id="res-simples-reparticao">0,00%</div>
+                            </div>
+                            <div class="result-card full-width highlight">
+                                <div class="label">Alíquota Efetiva do ISS a Recolher</div>
+                                <div class="value" id="res-simples-iss-final">0,00%</div>
+                            </div>
+                        </div>
+                        <div class="action-bar">
+                            <button class="btn-action" onclick="copiarTexto('result-simplesnacional')">📋 Copiar Dados</button>
                             <button class="btn-action" onclick="window.print()">🖨️ Imprimir</button>
                         </div>
                     </div>
@@ -1126,6 +1221,9 @@
 
     <script>
         let folhaMinimaCalculadaGlobal = 0;
+        
+        // Variaveis globais de controle de lote XML solicitadas no seu escopo
+        let somaNotas = 0, somaPis = 0, somaCofins = 0, somaFiscalIrrf = 0, somaCsll = 0;
 
         document.addEventListener('DOMContentLoaded', () => {
             initMenu();
@@ -1214,6 +1312,7 @@
                     if (id === 'pane-difal') calcularDifal();
                     else if (id === 'pane-fatorr') calcularFatorR();
                     else if (id === 'pane-rateiodas') calcularRateio();
+                    else if (id === 'pane-simplesnacional') calcularSimplesIss();
                 }
             });
         }
@@ -1238,8 +1337,16 @@
             if (!container) return;
 
             let textToCopy = "";
+            const cards = container.querySelectorAll('.result-card');
+            cards.forEach(card => {
+                const label = card.querySelector('.label').innerText;
+                const value = card.querySelector('.value').innerText;
+                textToCopy += `${label}: ${value}\n`;
+            });
+
+            textToCopy += "\n";
+
             const table = container.querySelector('table');
-            
             if(table) {
                 const rows = table.querySelectorAll('tr');
                 rows.forEach(row => {
@@ -1248,19 +1355,31 @@
                     cells.forEach(cell => rowText.push(cell.innerText.trim()));
                     textToCopy += rowText.join('\t') + '\n';
                 });
-            } else {
-                const cards = container.querySelectorAll('.result-card');
-                cards.forEach(card => {
-                    const label = card.querySelector('.label').innerText;
-                    const value = card.querySelector('.value').innerText;
-                    textToCopy += `${label}: ${value}\n`;
-                });
             }
 
             navigator.clipboard.writeText(textToCopy.trim()).then(() => {
-                showToast("Dados copiados para a área de transferência!");
+                showToast("Relatório copiado para a área de transferência!");
             }).catch(() => {
                 showToast("Erro ao tentar copiar dados.", true);
+            });
+        }
+
+        function copyTableToClipboard(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            let textToCopy = "";
+            const table = container.querySelector('table');
+            if(table) {
+                const rows = table.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('th, td');
+                    let rowText = [];
+                    cells.forEach(cell => rowText.push(cell.innerText.trim()));
+                    textToCopy += rowText.join('\t') + '\n';
+                });
+            }
+            navigator.clipboard.writeText(textToCopy.trim()).then(() => {
+                showToast("Matriz copiada com sucesso!");
             });
         }
 
@@ -1324,7 +1443,7 @@
             const metaFolha12Meses = fatAcumulado * 0.2801;
             const folhaMesAtualNecessaria = metaFolha12Meses - folhaAcumulada11;
             
-            folhaMinimaCalculadaGlobal = folhaMesAtualNecessaria < 0 ? 0 : folhaMesAtualNecessaria;
+            const folhaMinimaCalculadaGlobal = folhaMesAtualNecessaria < 0 ? 0 : folhaMesAtualNecessaria;
 
             document.getElementById('res-fator-fat').innerText = "R$ " + formatCurrencyValue(fatAcumulado);
             document.getElementById('res-fator-folha11').innerText = "R$ " + formatCurrencyValue(folhaAcumulada11);
@@ -1408,9 +1527,6 @@
             toggleResultState('rateiodas', true);
         }
 
-        // ==========================================================================
-        // CONTROLLER: ANALISADOR XML CLIENT-SIDE (NF-e)
-        // ==========================================================================
         function initXmlDragAndDrop() {
             const dropzone = document.getElementById('xml-dropzone');
             if(!dropzone) return;
@@ -1432,83 +1548,182 @@
             dropzone.addEventListener('drop', (e) => {
                 const dt = e.dataTransfer;
                 const files = dt.files;
-                processarArquivosXml(files);
+                dispararProcessamentoXml(files);
             }, false);
         }
 
-        function processarArquivosXml(files) {
-            const xmlFiles = Array.from(files).filter(file => file.name.endsWith('.xml'));
+        // ==========================================================================
+        // ENGINE: IMPLEMENTAÇÃO DO SEU MODELO ENVIADO COM SINTAXE LIMPA DO PORTAL
+        // ==========================================================================
+        function dispararProcessamentoXml(files) {
+            if (files.length === 0) return;
+
+            // Reset de acumuladores locais nativos do seu escopo
+            somaNotas = somaPis = somaCofins = somaFiscalIrrf = somaCsll = 0;
             
-            if(xmlFiles.length === 0) {
-                showToast("Nenhum arquivo .xml válido foi detectado.", true);
-                return;
-            }
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
 
-            let loteNotasProcessadas = [];
-            let totalGeralLote = 0;
-            let arquivosLeituraContador = 0;
+            let arquivosLidos = 0;
 
-            const tbody = document.getElementById('table-xml-rows');
-            tbody.innerHTML = ""; // Reset de segurança
-
-            xmlFiles.forEach(file => {
+            Array.from(files).forEach(file => {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    arquivosLeituraContador++;
-                    try {
-                        const parser = new DOMParser();
-                        const xmlDoc = parser.parseFromString(e.target.result, "text/xml");
-                        
-                        // Extração de chaves e tags estruturais da NF-e (Padrão SEFAZ)
-                        const nNF = xmlDoc.getElementsByTagName("nNF")[0]?.textContent || "N/A";
-                        const dhEmi = xmlDoc.getElementsByTagName("dhEmi")[0]?.textContent || xmlDoc.getElementsByTagName("dEmi")[0]?.textContent || "N/A";
-                        const xEmi = xmlDoc.getElementsByTagName("xEmit")[0]?.textContent || "Desconhecido";
-                        const xDest = xmlDoc.getElementsByTagName("xDest")[0]?.textContent || "Desconhecido";
-                        const vNF = parseFloat(xmlDoc.getElementsByTagName("vNF")[0]?.textContent || 0);
-
-                        // Formatação simplificada da data de emissão
-                        let dataFormatada = dhEmi !== "N/A" ? dhEmi.substring(0, 10).split('-').reverse().join('/') : "N/A";
-
-                        totalGeralLote += vNF;
-
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td>${nNF}</td>
-                            <td>${dataFormatada}</td>
-                            <td>${xEmi.substring(0, 25)}${xEmi.length > 25 ? '...' : ''}</td>
-                            <td>${xDest.substring(0, 25)}${xDest.length > 25 ? '...' : ''}</td>
-                            <td>R$ ${formatCurrencyValue(vNF)}</td>
-                        `;
-                        tbody.appendChild(tr);
-
-                    } catch (err) {
-                        console.error("Falha no parsing de um arquivo XML:", err);
-                    }
-
-                    // Se todos os leitores as síncronos finalizaram as threads de leitura
-                    if(arquivosLeituraContador === xmlFiles.length) {
-                        document.getElementById('xml-card-qtd').innerText = arquivosLeituraContador;
-                        document.getElementById('xml-card-total').innerText = "R$ " + formatCurrencyValue(totalGeralLote);
-                        
-                        // Modifica o estado do contêiner para ativo
-                        document.getElementById('xml-placeholder').style.display = 'none';
-                        document.getElementById('xml-container').classList.add('active');
-                        showToast(`Lote processado: ${arquivosLeituraContador} documentos homologados!`);
+                reader.onload = (e) => {
+                    // Executa a função de parseamento estrutural do seu modelo
+                    processarLogicaXmlModelo(e.target.result);
+                    arquivosLidos++;
+                    
+                    if (arquivosLidos === files.length) {
+                        atualizarDashboardLoteXml();
                     }
                 };
                 reader.readAsText(file);
             });
         }
 
+        function processarLogicaXmlModelo(xmlString) {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlString, "text/xml");
+            const tbody = document.getElementById('table-body');
+
+            const getValor = (tag) => {
+                const node = xmlDoc.getElementsByTagName(tag)[0];
+                return node ? parseFloat(node.textContent) : 0;
+            };
+
+            const getText = (tag) => {
+                const node = xmlDoc.getElementsByTagName(tag)[0];
+                return node ? node.textContent : "N/D";
+            };
+
+            // Mapeamentos nativos do seu arquivo de substituição
+            const numNota = getText("nNFSe");
+            const valorNota = getValor("vBC") > 0 ? getValor("vBC") : getValor("vServ");
+            
+            const pis = getValor("vPis");
+            const cofins = getValor("vCofins");
+            const irrf = getValor("vRetIRRF");
+            const csll = getValor("vRetCSLL");
+
+            const teveRetencao = (pis + cofins + irrf + csll) > 0;
+
+            // Consolidação nos acumuladores globais
+            somaNotas += valorNota;
+            somaPis += pis;
+            somaCofins += cofins;
+            somaFiscalIrrf += irrf;
+            somaCsll += csll;
+
+            // Criando a linha preservando o padrão de badges e estilos do Portal Fiscal
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="font-weight:700;">${numNota}</td>
+                <td>R$ ${formatCurrencyValue(valorNota)}</td>
+                <td>R$ ${formatCurrencyValue(pis)}</td>
+                <td>R$ ${formatCurrencyValue(cofins)}</td>
+                <td>R$ ${formatCurrencyValue(irrf)}</td>
+                <td>R$ ${formatCurrencyValue(csll)}</td>
+                <td>
+                    <span class="status-badge ${teveRetencao ? 'com-ret' : 'sem-ret'}">
+                        ${teveRetencao ? 'Retido' : 'Sem Retenção'}
+                    </span>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        function atualizarDashboardLoteXml() {
+            document.getElementById('tot-notas').innerText = "R$ " + formatCurrencyValue(somaNotas);
+            document.getElementById('tot-pis').innerText = "R$ " + formatCurrencyValue(somaPis);
+            document.getElementById('tot-cofins').innerText = "R$ " + formatCurrencyValue(somaCofins);
+            document.getElementById('tot-irrf').innerText = "R$ " + formatCurrencyValue(somaFiscalIrrf);
+            document.getElementById('tot-csll').innerText = "R$ " + formatCurrencyValue(somaCsll);
+            
+            document.getElementById('xml-placeholder').style.display = 'none';
+            document.getElementById('xml-container').classList.add('active');
+            showToast("Relatório XML processado com sucesso!");
+        }
+
         function limparPainelXml() {
             document.getElementById('xml-file-input').value = "";
-            document.getElementById('table-xml-rows').innerHTML = "";
-            document.getElementById('xml-card-qtd').innerText = "0";
-            document.getElementById('xml-card-total').innerText = "R$ 0,00";
+            document.getElementById('table-body').innerHTML = "";
+            document.getElementById('tot-notas').innerText = "R$ 0,00";
+            document.getElementById('tot-pis').innerText = "R$ 0,00";
+            document.getElementById('tot-cofins').innerText = "R$ 0,00";
+            document.getElementById('tot-irrf').innerText = "R$ 0,00";
+            document.getElementById('tot-csll').innerText = "R$ 0,00";
+            
+            somaNotas = somaPis = somaCofins = somaFiscalIrrf = somaCsll = 0;
             
             document.getElementById('xml-placeholder').style.display = 'flex';
             document.getElementById('xml-container').classList.remove('active');
-            showToast("Lote XML redefinido.");
+            showToast("Lote XML limpo.");
+        }
+
+        function calcularSimplesIss() {
+            const rbt12 = parseLocaleFloat(document.getElementById('simples-rbt12').value);
+
+            if (rbt12 <= 0) {
+                showToast("O faturamento acumulado deve ser maior que zero.", true);
+                return;
+            }
+
+            let faixa = "";
+            let aliqNominal = 0;
+            let deducao = 0;
+            let reparticaoIss = 0;
+
+            if (rbt12 <= 180000.00) {
+                faixa = "1ª Faixa (Até R$ 180.000,00)";
+                aliqNominal = 6.00;
+                deducao = 0;
+                reparticaoIss = 33.50;
+            } else if (rbt12 <= 360000.00) {
+                faixa = "2ª Faixa (R$ 180.000,01 a R$ 360.000,00)";
+                aliqNominal = 11.20;
+                deducao = 9360.00;
+                reparticaoIss = 32.00;
+            } else if (rbt12 <= 720000.00) {
+                faixa = "3ª Faixa (R$ 360.000,01 a R$ 720.000,00)";
+                aliqNominal = 13.50;
+                deducao = 17640.00;
+                reparticaoIss = 32.50;
+            } else if (rbt12 <= 1800000.00) {
+                faixa = "4ª Faixa (R$ 720.000,01 a R$ 1.800.000,00)";
+                aliqNominal = 16.00;
+                deducao = 35640.00;
+                reparticaoIss = 32.50;
+            } else if (rbt12 <= 3600000.00) {
+                faixa = "5ª Faixa (R$ 1.800.000,01 a R$ 3.600.000,00)";
+                aliqNominal = 21.00;
+                deducao = 125640.00;
+                reparticaoIss = 33.50;
+            } else if (rbt12 <= 4800000.00) {
+                faixa = "6ª Faixa (R$ 3.600.000,01 a R$ 4.800.000,00)";
+                aliqNominal = 33.00;
+                deducao = 648000.00;
+                reparticaoIss = 56.50;
+            } else {
+                showToast("Faturamento ultrapassou o limite máximo.", true);
+                return;
+            }
+
+            let aliqEfetiva = ((rbt12 * (aliqNominal / 100)) - deducao) / rbt12 * 100;
+            if (aliqEfetiva < 0) aliqEfetiva = 0;
+
+            let issFinal = aliqEfetiva * (reparticaoIss / 100);
+            if (issFinal > 5.00) {
+                issFinal = 5.00;
+            }
+
+            document.getElementById('res-simples-faixa').innerText = faixa;
+            document.getElementById('res-simples-nominal').innerText = formatPercentValue(aliqNominal);
+            document.getElementById('res-simples-efetiva').innerText = formatPercentValue(aliqEfetiva);
+            document.getElementById('res-simples-reparticao').innerText = formatPercentValue(reparticaoIss);
+            document.getElementById('res-simples-iss-final').innerText = formatPercentValue(issFinal);
+
+            toggleResultState('simplesnacional', true);
+            showToast("Alíquota do ISS calculada!");
         }
     </script>
 </body>
